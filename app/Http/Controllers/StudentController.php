@@ -20,7 +20,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -28,7 +28,18 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'student_id' => 'required',
+            'course' => 'required',
+            'year' => 'required|numeric',
+            'block' => 'required|string|uppercase|max:1',
+            'barangay' => 'required',
+            'municipality' => 'required'
+        ]);
+        $student = Student::create($request->all());
+        return  response()->json($student, 201);
     }
 
     /**
@@ -42,7 +53,7 @@ class StudentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Student $student)
+    public function edit()
     {
         //
     }
@@ -50,16 +61,53 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(Request $request, $id)
     {
-        //
+        $student = Student::find($id);
+        if($student){
+            $request->validate([
+                'firstname' => 'required|string',
+                'lastname' => 'required|string',
+                'student_id' => 'required',
+                'course' => 'required|string|max:5',
+                'year' => 'required|numeric',
+                'block' => 'required|string|uppercase|max:1',
+                'barangay' => 'required',
+                'municipality' => 'required'
+            ]);
+            $student->update($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Student Data Updated!'
+            ]);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Student Data Deleted!'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Student $student)
+    public function destroy($id)
     {
-        //
+        $student = Student::find($id);
+        if($student){
+            if($student->delete()){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Student Data Deleted!'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Student Data Deletion fail!'
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Student Doesn\'t Exist!'
+        ]);
     }
 }
